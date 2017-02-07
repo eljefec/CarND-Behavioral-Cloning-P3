@@ -22,6 +22,13 @@ X_train = pre.normalize(X_train)
 image_shape = X_train.shape[1:]
 model = bld.build_model(image_shape)
 
-print('Built model')
+print('Built model.')
 
-# Train model.
+# Compile and train the model here.
+model.compile('adam', 'mse', ['accuracy'])
+
+history = model.fit(X_train, y_train, batch_size=128, nb_epoch=10, validation_split=0.2)
+
+model.save('model.h5')
+
+print('Saved model.')
