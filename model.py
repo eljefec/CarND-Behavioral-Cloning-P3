@@ -10,7 +10,9 @@ tf.python.control_flow_ops = tf
 (X_train, y_train) = ld.load_data('train.p', 'd:\\carcapture')
 
 # Normalize features using Min-Max scaling between -0.5 and 0.5.
-X_train = pre.normalize(X_train)
+group_size = 1024
+for i in range(0, X_train.shape[0], group_size):
+    X_train[i:i+group_size] = pre.normalize(X_train[i:i+group_size])
 
 # Split test data.
 (X_train, X_test, y_train, y_test) = pre.split(X_train, y_train, 0.2)
