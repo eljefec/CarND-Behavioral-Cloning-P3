@@ -1,11 +1,13 @@
 import load as ld
+import pre
+import build as bld
+
+# Fix error with TF and Keras
+import tensorflow as tf
+tf.python.control_flow_ops = tf
 
 # Load data.
 (X_train, y_train) = ld.load_data('train.p', 'd:\\carcapture')
-
-print('shape:', X_train.shape, y_train.shape)
-
-import pre
 
 # Normalize features using Min-Max scaling between -0.5 and 0.5.
 X_train = pre.normalize(X_train)
@@ -16,16 +18,10 @@ X_train = pre.normalize(X_train)
 # Shuffle training data.
 (X_train, y_train) = pre.shuffle(X_train, y_train)
 
-import pickle
-import numpy as np
-import math
-
-# Fix error with TF and Keras
-import tensorflow as tf
-tf.python.control_flow_ops = tf
-
-print('Modules loaded.')
-
 # Build Keras model.
+image_shape = X_train.shape[1:]
+model = bld.build_model(image_shape)
 
-# Traing model.
+print('Built model')
+
+# Train model.
