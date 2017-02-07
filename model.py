@@ -29,6 +29,9 @@ def load_images(df):
     y = np.array(y)
     return (X, y)
 
+X_list = []
+y_list = []
+
 for capdir in capdirs:
     csvpath = os.path.join(capdir, 'driving_log.csv')
     print(csvpath)
@@ -37,6 +40,31 @@ for capdir in capdirs:
     # print(df)
     (X, y) = load_images(df)
     print('shape:', X.shape, y.shape)
+    X_list.append(X)
+    y_list.append(y)
+
+X_train = np.concatenate(X_list)
+y_train = np.concatenate(y_list)
+
+print('shape:', X_train.shape, y_train.shape)
+
+from os.path import isfile
+import pickle
+
+filename = 'train.p'
+data = dict()
+data['features'] = X_train
+data['labels'] = y_train
+
+if not isfile(filename):
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+
+with open(filename, 'rb') as f:
+    data = pickle.load(f)
+
+X_train = data['features']
+y_train = data['labels']
 
 # Normalize features using Min-Max scaling between -0.5 and 0.5.
 
