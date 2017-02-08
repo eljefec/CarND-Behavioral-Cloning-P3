@@ -12,14 +12,16 @@ def get_immediate_subdirectories(a_dir):
     return [(os.path.join(a_dir, name)) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-# https://carnd-forums.udacity.com/questions/36054925/answers/36057843
+# Source: https://carnd-forums.udacity.com/questions/36054925/answers/36057843
 
-def load_images(df):
+def load_images(df, capdir, relative):
     X = []
     y = []
     for row in df.itertuples(True):
         imgpath = row[1]
         steering_angle = row[4]
+        if relative:
+            imgpath = os.path.join(capdir, imgpath)
         img = mpimg.imread(imgpath)
         X.append(img)
         y.append(steering_angle)
@@ -27,7 +29,7 @@ def load_images(df):
     y = np.array(y)
     return (X, y)
 
-def load_captures(capdirs):
+def load_captures(capdirs, relative):
     X_list = []
     y_list = []
     csv_list = []
@@ -37,7 +39,7 @@ def load_captures(capdirs):
         print(csvpath)
 
         df = pd.read_csv(csvpath)
-        (X, y) = load_images(df)
+        (X, y) = load_images(df, capdir, relative)
 
         print('shape:', X.shape, y.shape)
 
@@ -52,7 +54,7 @@ def load_captures(capdirs):
 
     return (X, y, csv_list)
 
-def load_data(filename, capture_root):
+def load_data(filename, capture_root, relative):
     if isfile(filename):
         with open(filename, 'rb') as f:
             data = pickle.load(f)
@@ -68,7 +70,7 @@ def load_data(filename, capture_root):
 
         capdirs = get_immediate_subdirectories(capture_root)
 
-        (X, y, csv_list) = load_captures(capdirs)
+        (X, y, csv_list) = load_captures(capdirs, relative)
 
         data = dict()
         data['features'] = X
