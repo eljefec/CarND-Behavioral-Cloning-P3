@@ -8,14 +8,7 @@ import tensorflow as tf
 tf.python.control_flow_ops = tf
 
 # Load data.
-(X_train, y_train) = ld.load_data('udacity-train.p', 'e:\\udacity-data', True)
-
-# Normalize features.
-group_size = 1024
-for i in range(0, X_train.shape[0], group_size):
-    X_train[i:i+group_size] = pre.normalize(X_train[i:i+group_size])
-
-print('Normalized input.')
+(X_train, y_train) = ld.load_normalized_data('udacity-train.p', 'e:\\udacity-data', True)
 
 # Split test data.
 (X_train, X_test, y_train, y_test) = pre.split(X_train, y_train, 0.2)
@@ -25,7 +18,7 @@ print('Normalized input.')
 
 # Build Keras model.
 image_shape = X_train.shape[1:]
-model = bld.build_model(image_shape)
+model = bld.build_model_nvda(image_shape)
 
 print('Built model.')
 

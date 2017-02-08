@@ -1,5 +1,6 @@
 # Load data.
 
+import pre
 import os
 import numpy as np
 import pandas as pd
@@ -54,7 +55,7 @@ def load_captures(capdirs, relative):
 
     return (X, y, csv_list)
 
-def load_data(filename, capture_root, relative):
+def load_normalized_data(filename, capture_root, relative):
     if isfile(filename):
         with open(filename, 'rb') as f:
             data = pickle.load(f)
@@ -71,6 +72,13 @@ def load_data(filename, capture_root, relative):
         capdirs = get_immediate_subdirectories(capture_root)
 
         (X, y, csv_list) = load_captures(capdirs, relative)
+
+        # Normalize features.
+        group_size = 1024
+        for i in range(0, X.shape[0], group_size):
+            X[i:i+group_size] = pre.normalize(X[i:i+group_size])
+
+        print('Normalized input.')
 
         data = dict()
         data['features'] = X
