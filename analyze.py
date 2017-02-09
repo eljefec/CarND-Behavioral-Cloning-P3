@@ -18,7 +18,7 @@ args = parser.parse_args()
 model = load_model(args.model)
 
 # Load data.
-(X_train, y_train) = ld.load_normalized_data('udacity-train.p', 'e:\\udacity-data', True)
+(X_train, y_train) = ld.load_data('udacity-train.p', 'e:\\udacity-data', True)
 
 plot_histogram(y_train, 20, 'Train')
 

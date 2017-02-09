@@ -1,6 +1,24 @@
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.layers.core import Dense, Dropout, Activation, Flatten, Lambda
 from keras.layers import Convolution2D, MaxPooling2D, AveragePooling2D
+
+def build_model(name, input_shape):
+    if name == 'simple':
+        return build_model_simple(input_shape)
+    elif name == 'nvda':
+        return build_model_nvda(input_shape)
+    elif name == 'complex':
+        return build_model_complex(input_shape)
+    else:
+        raise ValueError('Invalid model name [{}]'.format(name))
+
+def build_model_simple(input_shape):
+    model = Sequential()
+    model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = input_shape))
+    model.add(Flatten())
+    model.add(Dense(128))
+    model.add(Dense(1))
+    return model
 
 def add_conv(model, nb_filter, nb_row, nb_col, pool):
     model.add(Convolution2D(nb_filter, nb_row, nb_col, border_mode = 'valid'))
@@ -11,11 +29,11 @@ def add_conv(model, nb_filter, nb_row, nb_col, pool):
 def build_model_nvda(input_shape):
     model = Sequential()
 
+    model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = input_shape))
+
     # Let this layer modify color.
     # This layer is inspired by "Color Space Transformation Network" at https://arxiv.org/ftp/arxiv/papers/1511/1511.01064.pdf.
-    model.add(Convolution2D(3, 1, 1,
-                            border_mode = 'valid',
-                            input_shape = input_shape))
+    model.add(Convolution2D(3, 1, 1, border_mode = 'valid'))
 
     model.add(AveragePooling2D())
 
@@ -36,8 +54,10 @@ def build_model_nvda(input_shape):
     model.add(Dense(1))
     return model
 
-def build_model(input_shape):
+def build_model_complex(input_shape):
     model = Sequential()
+
+    model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = input_shape))
 
     # Let this layer modify color.
     # This layer is inspired by "Color Space Transformation Network" at https://arxiv.org/ftp/arxiv/papers/1511/1511.01064.pdf.
