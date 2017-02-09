@@ -22,7 +22,7 @@ def load_images(df, capdir, relative):
 
         # center, left, right images
         for i in range(1, 4):
-            imgpath = row[i]
+            imgpath = row[i].strip()
             if imgpath:
                 if relative:
                     imgpath = os.path.join(capdir, imgpath)
@@ -104,5 +104,7 @@ def load_data(filename, capture_root, relative):
 
         print('Dumped pickle. [{}]'.format(filename))
         print(csv_list)
+
+    print('X.shape={}'.format(X.shape))
 
     return (X, y)

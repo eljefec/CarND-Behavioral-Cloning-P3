@@ -29,6 +29,8 @@ model.compile(optimizer = Adam(lr = 0.0001), loss = 'mse', metrics = ['accuracy'
 
 history = model.fit(X_train, y_train, batch_size=128, nb_epoch=10, validation_split=0.2)
 
-model.save('model-{}.h5'.format(model_name))
+model_filename = 'model-{}.h5'.format(model_name)
 
-print('Saved model.')
+model.save(model_filename)
+
+print('Saved model. [{}]'.format(model_filename))
