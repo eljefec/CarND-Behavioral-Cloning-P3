@@ -8,7 +8,6 @@ def plot_histogram(y, bins, titleprefix):
     plt.xlabel(titleprefix + ' Label')
     plt.ylabel('Count')
     plt.title('Histogram of ' + titleprefix + ' Labels')
-    plt.show()
     
 parser = argparse.ArgumentParser(description='Predictions')
 parser.add_argument('model', type=str,
@@ -20,9 +19,11 @@ model = load_model(args.model)
 # Load data.
 (X_train, y_train) = ld.load_data('udacity-train.p', 'e:\\udacity-data', True)
 
-plot_histogram(y_train, 20, 'Train')
-
 predictions = model.predict(X_train)
 print(predictions.shape)
 
-plot_histogram(predictions, 20, 'Predictions')
+plt.subplot(211)
+plot_histogram(y_train, 40, 'Train')
+plt.subplot(212)
+plot_histogram(predictions, 40, 'Predictions')
+plt.show()

@@ -17,13 +17,35 @@ def load_images(df, capdir, relative):
     X = []
     y = []
     for row in df.itertuples(True):
-        imgpath = row[1]
+        images = []
+        angles = []
+
+        # center, left, right images
+        for i in range(1, 4):
+            imgpath = row[i]
+            if imgpath:
+                if relative:
+                    imgpath = os.path.join(capdir, imgpath)
+                if isfile(imgpath):
+                    img = cv2.imread(imgpath)
+                    images.append(img)
+
         steering_angle = row[4]
-        if relative:
-            imgpath = os.path.join(capdir, imgpath)
-        img = cv2.imread(imgpath)
-        X.append(img)
-        y.append(steering_angle)
+
+        correction = 0.1
+        if len(images) >= 1:
+            angles.append(steering_angle)
+        if len(images) == 2:
+            print(row)
+            raise ValueError('Unexpected number of images found.')
+        if len(images) == 3:
+            angles.append(steering_angle + correction)
+            angles.append(steering_angle - correction)
+
+        for image, angle in zip(images, angles):
+            X.append(image)
+            y.append(angle)
+
     X = np.array(X)
     y = np.array(y)
     return (X, y)
