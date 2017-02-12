@@ -32,7 +32,7 @@ def load_images(df, capdir, relative):
 
         steering_angle = row[4]
 
-        correction = 0.1
+        correction = 0.15
         if len(images) >= 1:
             angles.append(steering_angle)
         if len(images) == 2:
@@ -45,6 +45,11 @@ def load_images(df, capdir, relative):
         for image, angle in zip(images, angles):
             X.append(image)
             y.append(angle)
+
+            flipped_image = cv2.flip(image, 1)
+            flipped_angle = angle * -1.0
+            X.append(flipped_image)
+            y.append(flipped_angle)
 
     X = np.array(X)
     y = np.array(y)
