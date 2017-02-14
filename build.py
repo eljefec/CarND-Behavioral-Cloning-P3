@@ -48,6 +48,8 @@ def build_model_nvda(input_shape):
     add_conv(model, 64, 3, 3, pool = False)
     add_conv(model, 64, 3, 3, pool = False)
 
+    model.add(Dropout(0.5))
+
     model.add(Flatten())
 
     model.add(Dense(100))

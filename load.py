@@ -13,7 +13,7 @@ def get_immediate_subdirectories(a_dir):
     return [(os.path.join(a_dir, name)) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-def load_images(df, capdir, relative):
+def load_images(df, capdir):
     X = []
     y = []
     for row in df.itertuples(True):
@@ -24,7 +24,7 @@ def load_images(df, capdir, relative):
         for i in range(1, 4):
             imgpath = row[i].strip()
             if imgpath:
-                if relative:
+                if not isfile(imgpath):
                     imgpath = os.path.join(capdir, imgpath)
                 if isfile(imgpath):
                     img = cv2.imread(imgpath)
@@ -32,7 +32,7 @@ def load_images(df, capdir, relative):
 
         steering_angle = row[4]
 
-        correction = 0.15
+        correction = 0.1
         if len(images) >= 1:
             angles.append(steering_angle)
         if len(images) == 2:
@@ -55,7 +55,7 @@ def load_images(df, capdir, relative):
     y = np.array(y)
     return (X, y)
 
-def load_captures(capdirs, relative):
+def load_captures(capdirs):
     X_list = []
     y_list = []
     csv_list = []
@@ -66,7 +66,7 @@ def load_captures(capdirs, relative):
 
         # Source: https://carnd-forums.udacity.com/questions/36054925/answers/36057843
         df = pd.read_csv(csvpath)
-        (X, y) = load_images(df, capdir, relative)
+        (X, y) = load_images(df, capdir)
 
         print('shape:', X.shape, y.shape)
 
@@ -81,7 +81,7 @@ def load_captures(capdirs, relative):
 
     return (X, y, csv_list)
 
-def load_data(filename, capture_root, relative):
+def load_data(filename, capture_root):
     if isfile(filename):
         with open(filename, 'rb') as f:
             data = pickle.load(f)
@@ -97,7 +97,7 @@ def load_data(filename, capture_root, relative):
 
         capdirs = get_immediate_subdirectories(capture_root)
 
-        (X, y, csv_list) = load_captures(capdirs, relative)
+        (X, y, csv_list) = load_captures(capdirs)
 
         data = dict()
         data['features'] = X

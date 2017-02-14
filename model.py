@@ -9,7 +9,7 @@ parser.add_argument('id', type=str, help='Optional id.')
 args = parser.parse_args()
 
 # Load data.
-(X_train, y_train) = ld.load_data('udacity-flip-corr0.15-train.p', 'e:\\udacity-data', True)
+(X_train, y_train) = ld.load_data('udacity-recoverctr-fork5x-corr0.1-train.p', 'e:\\udacity-data')
 
 # Split test data.
 (X_train, X_test, y_train, y_test) = pre.split(X_train, y_train, 0.2)
