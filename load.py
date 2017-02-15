@@ -13,7 +13,7 @@ def get_immediate_subdirectories(a_dir):
     return [(os.path.join(a_dir, name)) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-def load_images(df, capdir):
+def load_images(df, capdir, steering_correction):
     X = []
     y = []
     for row in df.itertuples(True):
@@ -32,15 +32,14 @@ def load_images(df, capdir):
 
         steering_angle = row[4]
 
-        correction = 0.1
         if len(images) >= 1:
             angles.append(steering_angle)
         if len(images) == 2:
             print(row)
             raise ValueError('Unexpected number of images found.')
         if len(images) == 3:
-            angles.append(steering_angle + correction)
-            angles.append(steering_angle - correction)
+            angles.append(steering_angle + steering_correction)
+            angles.append(steering_angle - steering_correction)
 
         for image, angle in zip(images, angles):
             X.append(image)
@@ -55,7 +54,7 @@ def load_images(df, capdir):
     y = np.array(y)
     return (X, y)
 
-def load_captures(capdirs):
+def load_captures(capdirs, steering_correction):
     X_list = []
     y_list = []
     csv_list = []
@@ -66,7 +65,7 @@ def load_captures(capdirs):
 
         # Source: https://carnd-forums.udacity.com/questions/36054925/answers/36057843
         df = pd.read_csv(csvpath)
-        (X, y) = load_images(df, capdir)
+        (X, y) = load_images(df, capdir, steering_correction)
 
         print('shape:', X.shape, y.shape)
 
@@ -81,7 +80,12 @@ def load_captures(capdirs):
 
     return (X, y, csv_list)
 
-def load_data(filename, capture_root):
+def get_pickle_filename(model_id, steering_correction):
+    return '{}-corr{}-train.p'.format(model_id, steering_correction)
+
+def load_data(model_id, capture_root, steering_correction):
+    filename = get_pickle_filename(model_id, steering_correction)
+
     if isfile(filename):
         with open(filename, 'rb') as f:
             data = pickle.load(f)
@@ -97,7 +101,7 @@ def load_data(filename, capture_root):
 
         capdirs = get_immediate_subdirectories(capture_root)
 
-        (X, y, csv_list) = load_captures(capdirs)
+        (X, y, csv_list) = load_captures(capdirs, steering_correction)
 
         data = dict()
         data['features'] = X

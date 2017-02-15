@@ -21,9 +21,10 @@ def build_model_simple(input_shape):
     return model
 
 def add_conv(model, nb_filter, nb_row, nb_col, pool):
-    model.add(Convolution2D(nb_filter, nb_row, nb_col, border_mode = 'valid'))
     if (pool):
-        model.add(MaxPooling2D(pool_size = (2, 2)))
+        model.add(Convolution2D(nb_filter, nb_row, nb_col, subsample = (2, 2), border_mode = 'valid'))
+    else:
+        model.add(Convolution2D(nb_filter, nb_row, nb_col, border_mode = 'valid'))
     model.add(Activation('relu'))
     print(model.outputs)
 
@@ -40,24 +41,21 @@ def build_model_nvda(input_shape):
     # This layer is inspired by "Color Space Transformation Network" at https://arxiv.org/ftp/arxiv/papers/1511/1511.01064.pdf.
     model.add(Convolution2D(3, 1, 1, border_mode = 'valid'))
 
-    model.add(AveragePooling2D())
-
     add_conv(model, 24, 5, 5, pool = True)
-    add_conv(model, 36, 5, 5, pool = False)
+    add_conv(model, 36, 5, 5, pool = True)
     add_conv(model, 48, 5, 5, pool = True)
-    add_conv(model, 64, 3, 3, pool = False)
-    add_conv(model, 64, 3, 3, pool = False)
-
-    model.add(Dropout(0.5))
+    add_conv(model, 64, 3, 3, pool = True)
+    add_conv(model, 64, 3, 3, pool = True)
 
     model.add(Flatten())
 
-    model.add(Dense(100))
-    model.add(Activation('relu'))
-    model.add(Dense(50))
-    model.add(Activation('relu'))
-    model.add(Dense(10))
-    model.add(Activation('relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(100, activation = 'relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(50, activation = 'relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(10, activation = 'relu'))
+    model.add(Dropout(0.5))
     model.add(Dense(1))
     return model
 
