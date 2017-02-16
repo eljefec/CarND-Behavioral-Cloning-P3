@@ -4,7 +4,7 @@ import pre
 import build as bld
 from keras.optimizers import Adam
 
-def train_model(model_id, capture_root, steering_correction, dropout):
+def train_model(model_id, capture_root, steering_correction, dropout, dropouts):
     print('Train model. id=[{}], capture_root=[{}], steering_correction=[{}], dropout=[{}]'.format(model_id, capture_root, steering_correction, dropout))
 
     # Load data.
@@ -21,7 +21,7 @@ def train_model(model_id, capture_root, steering_correction, dropout):
     # Build Keras model.
     image_shape = X_train.shape[1:]
     model_builder = bld.ModelBuilder(dropout, image_shape)
-    model = model_builder.build_model(model_name)
+    model = model_builder.build_model(model_name, dropouts)
 
     print('Built model. [{}]'.format(model_name))
 
@@ -36,7 +36,7 @@ def train_model(model_id, capture_root, steering_correction, dropout):
 
     history = model.fit(X_train, y_train, batch_size=128, nb_epoch=10, validation_split=0.2)
 
-    model_filename = 'model-{}-{}-corr{}-drop{}.h5'.format(model_name, model_id, steering_correction, dropout)
+    model_filename = 'model-{}-{}-corr{}-drop{}-d{:d}{:d}{:d}{:d}.h5'.format(model_name, model_id, steering_correction, dropout, dropouts[0], dropouts[1], dropouts[2], dropouts[3])
 
     model.save(model_filename)
 
@@ -46,6 +46,10 @@ parser = argparse.ArgumentParser(description='Build Model')
 parser.add_argument('id', type=str, help='Optional id.')
 args = parser.parse_args()
 
-for steering_correction in [0.10, 0.12, 0.14, 0.16]:
+for steering_correction in [0.14]:
     for dropout in [0.2, 0.4]:
-        train_model(args.id, 'e:\\capture-data', steering_correction, dropout)
+        for dropouts in [[True, False, False, False], 
+                         [False, True, False, False], 
+                         [False, False, True, False], 
+                         [True, True, True, False]]:
+            train_model(args.id, 'e:\\capture-data', steering_correction, dropout, dropouts)

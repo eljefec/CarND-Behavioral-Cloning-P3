@@ -7,11 +7,11 @@ class ModelBuilder:
         self.dropout = dropout
         self.input_shape = input_shape
 
-    def build_model(self, name):
+    def build_model(self, name, dropouts):
         if name == 'simple':
             return self.build_model_simple()
         elif name == 'nvda':
-            return self.build_model_nvda()
+            return self.build_model_nvda(dropouts)
         elif name == 'complex':
             return self.build_model_complex()
         else:
@@ -33,7 +33,7 @@ class ModelBuilder:
         model.add(Activation('relu'))
         print(model.outputs)
 
-    def build_model_nvda(self):
+    def build_model_nvda(self, dropouts):
         model = Sequential()
 
         # Crop out sky (50 pixels) and car hood (20 pixels).
@@ -54,13 +54,24 @@ class ModelBuilder:
 
         model.add(Flatten())
 
-        model.add(Dropout(self.dropout))
+        if dropouts[0]:
+            model.add(Dropout(self.dropout))
+
         model.add(Dense(100, activation = 'relu'))
-        model.add(Dropout(self.dropout))
+
+        if dropouts[1]:
+            model.add(Dropout(self.dropout))
+
         model.add(Dense(50, activation = 'relu'))
-        model.add(Dropout(self.dropout))
+
+        if dropouts[2]:
+            model.add(Dropout(self.dropout))
+
         model.add(Dense(10, activation = 'relu'))
-        model.add(Dropout(self.dropout))
+
+        if dropouts[3]:
+            model.add(Dropout(self.dropout))
+
         model.add(Dense(1))
         return model
 
