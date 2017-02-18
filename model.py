@@ -46,10 +46,8 @@ parser = argparse.ArgumentParser(description='Build Model')
 parser.add_argument('id', type=str, help='Optional id.')
 args = parser.parse_args()
 
-for steering_correction in [0.14]:
-    for dropout in [0.2, 0.4]:
-        for dropouts in [[True, False, False, False], 
-                         [False, True, False, False], 
-                         [False, False, True, False], 
-                         [True, True, True, False]]:
-            train_model(args.id, 'e:\\capture-data', steering_correction, dropout, dropouts)
+dropouts = [True, True, True, True]
+
+for steering_correction in [0.12, 0.14, 0.16, 0.18, 0.2]:
+    for dropout in [0.25]:
+        train_model(args.id, 'e:\\capture-data', steering_correction, dropout, dropouts)
