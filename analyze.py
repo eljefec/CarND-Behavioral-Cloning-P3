@@ -16,7 +16,7 @@ args = parser.parse_args()
 model = load_model(args.model)
 
 # Load data.
-(X_train, y_train) = ld.load_data('udacity-flip-train.p', 'e:\\udacity-data', True)
+(X_train, y_train) = ld.load_data('earlystop', 'e:\\capture-data', 0.14, True)
 
 predictions = model.predict(X_train)
 print(predictions.shape)

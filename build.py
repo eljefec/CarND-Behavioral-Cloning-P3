@@ -7,11 +7,11 @@ class ModelBuilder:
         self.dropout = dropout
         self.input_shape = input_shape
 
-    def build_model(self, name, dropouts):
+    def build_model(self, name):
         if name == 'simple':
             return self.build_model_simple()
         elif name == 'nvda':
-            return self.build_model_nvda(dropouts)
+            return self.build_model_nvda()
         elif name == 'complex':
             return self.build_model_complex()
         else:
@@ -31,9 +31,8 @@ class ModelBuilder:
         else:
             model.add(Convolution2D(nb_filter, nb_row, nb_col, border_mode = 'valid'))
         model.add(Activation('relu'))
-        print(model.outputs)
 
-    def build_model_nvda(self, dropouts):
+    def build_model_nvda(self):
         model = Sequential()
 
         # Crop out sky (50 pixels) and car hood (20 pixels).
@@ -53,24 +52,16 @@ class ModelBuilder:
         self.add_conv(model, 64, 3, 3, pool = True)
 
         model.add(Flatten())
-
-        if dropouts[0]:
-            model.add(Dropout(self.dropout))
+        model.add(Dropout(self.dropout))
 
         model.add(Dense(100, activation = 'relu'))
-
-        if dropouts[1]:
-            model.add(Dropout(self.dropout))
+        model.add(Dropout(self.dropout))
 
         model.add(Dense(50, activation = 'relu'))
-
-        if dropouts[2]:
-            model.add(Dropout(self.dropout))
+        model.add(Dropout(self.dropout))
 
         model.add(Dense(10, activation = 'relu'))
-
-        if dropouts[3]:
-            model.add(Dropout(self.dropout))
+        model.add(Dropout(self.dropout))
 
         model.add(Dense(1))
         return model

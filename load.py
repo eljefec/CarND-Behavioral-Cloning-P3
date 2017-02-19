@@ -13,15 +13,21 @@ def get_immediate_subdirectories(a_dir):
     return [(os.path.join(a_dir, name)) for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-def load_images(df, capdir, steering_correction):
+def load_images(df, capdir, steering_correction, center_only):
     X = []
     y = []
     for row in df.itertuples(True):
         images = []
         angles = []
 
-        # center, left, right images
-        for i in range(1, 4):
+        if center_only:
+            # Use center image only.
+            range_end = 2
+        else:
+            # Use center, left, right images.
+            range_end = 4
+
+        for i in range(1, range_end):
             imgpath = row[i].strip()
             if imgpath:
                 if not isfile(imgpath):
@@ -54,7 +60,7 @@ def load_images(df, capdir, steering_correction):
     y = np.array(y)
     return (X, y)
 
-def load_captures(capdirs, steering_correction):
+def load_captures(capdirs, steering_correction, center_only):
     X_list = []
     y_list = []
     csv_list = []
@@ -65,7 +71,7 @@ def load_captures(capdirs, steering_correction):
 
         # Source: https://carnd-forums.udacity.com/questions/36054925/answers/36057843
         df = pd.read_csv(csvpath)
-        (X, y) = load_images(df, capdir, steering_correction)
+        (X, y) = load_images(df, capdir, steering_correction, center_only)
 
         print('shape:', X.shape, y.shape)
 
@@ -80,11 +86,15 @@ def load_captures(capdirs, steering_correction):
 
     return (X, y, csv_list)
 
-def get_pickle_filename(model_id, steering_correction):
-    return '{}-corr{}-train.p'.format(model_id, steering_correction)
+def get_pickle_filename(model_id, steering_correction, center_only):
+    if center_only:
+        center_id = '-centeronly'
+    else:
+        center_id = ''
+    return '{}-corr{}{}-train.p'.format(model_id, steering_correction, center_id)
 
-def load_data(model_id, capture_root, steering_correction):
-    filename = get_pickle_filename(model_id, steering_correction)
+def load_data(model_id, capture_root, steering_correction, center_only):
+    filename = get_pickle_filename(model_id, steering_correction, center_only)
 
     if isfile(filename):
         with open(filename, 'rb') as f:
@@ -101,12 +111,13 @@ def load_data(model_id, capture_root, steering_correction):
 
         capdirs = get_immediate_subdirectories(capture_root)
 
-        (X, y, csv_list) = load_captures(capdirs, steering_correction)
+        (X, y, csv_list) = load_captures(capdirs, steering_correction, center_only)
 
         data = dict()
         data['features'] = X
         data['labels'] = y
         data['csvlist'] = csv_list
+        data['center_only'] = center_only
 
         with open(filename, 'wb') as f:
             pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
