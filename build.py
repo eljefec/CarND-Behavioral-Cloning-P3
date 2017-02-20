@@ -20,6 +20,8 @@ class ModelBuilder:
     def build_model_simple(self):
         model = Sequential()
         model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape = self.input_shape))
+        model.add(AveragePooling2D(pool_size = (2, 2)))
+        model.add(AveragePooling2D(pool_size = (2, 2)))
         model.add(Flatten())
         model.add(Dense(128))
         model.add(Dense(1))
