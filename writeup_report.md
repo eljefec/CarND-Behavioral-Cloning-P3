@@ -16,13 +16,12 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
+[image_center]: ./writeup_images/center.png "Center Image"
+[image_left]: ./writeup_images/left.png "Left Image"
+[image_right]: ./writeup_images/right.png "Right Image"
+[image_fork_center]: ./writeup_images/fork_center.png "Fork Center Image"
+[image_fork_left]: ./writeup_images/fork_left.png "Fork Left Image"
+[image_fork_right]: ./writeup_images/fork_right.png "Fork Right Image"
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -98,7 +97,7 @@ I started with a convolutional neural network similar to the [Nvidia model](http
 
 I proceeded to augment the training data. 
 
-I flipped all images horizontally (and negated their corresponding steering angles) to double my training set size. This also balanced the bias in the data towards left turns such that left and right turns were equally represented.
+I flipped all images horizontally (and negated their corresponding steering angles) to double my training set size. This also balanced the bias in the data towards left turns such that left and right turns were equally represented. See load.py lines 57-60.
 
 I incorporated the left and right camera images and used them as training examples by modifying the actual steering angle with an appropriate correction value (this ended up being 0.04 in my final model).
 
@@ -171,32 +170,29 @@ The final model architecture (build.py lines 49-81) consisted of a convolution n
     Non-trainable params: 0
     ____________________________________________________________________________________________________
 
-## TODO below
-
 ####3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I used the data provided by Udacity, which represented center lane driving. Here is an example image of center lane driving:
 
-![alt text][image2]
+![Center Image Example][image_center]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+For examples of recovery from the sides of the road, I included images taken by the left and right cameras and corrected the steering angle from the center image.
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![Left Image Example][image_left]
+![Right Image Example][image_right]
 
-Then I repeated this process on track two in order to get more data points.
+I recorded the vehicle correctly driving through the pavement-dirt fork section. I needed to include 5 copies of this dataset for the model to correctly navigate the fork.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+![Fork Center Image][image_fork_center]
+![Fork Left Image][image_fork_left]
+![Fork Right Image][image_fork_right]
 
-![alt text][image6]
-![alt text][image7]
+To augment the data sat, I flipped images and angles. This would also avoid the bias in the training set for left turns. See load.py lines 57-60.
 
-Etc ....
+After the collection process, I had 50136 training examples. I did not preprocess the data. I normalized the data through a Lambda layer in the Keras model.
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+I randomly shuffled the data set and put 20% of the data into a validation set. 
 
+I used the training data for training the model. The validation set helped determine if the model was over or under fitting. 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+The number of epochs varied by run because I used the EarlyStopping Keras callback, and I did not notice an ideal number of epochs. In my final model, the number of epochs was 13. I used an adam optimizer so that manually training the learning rate wasn't necessary.
