@@ -71,6 +71,7 @@ def make_dir_if_not_exist(path):
     if not os.path.isdir(path):
         os.mkdir(path)
 
+# Returns a model filename including parameters.
 def get_model_filename(model_name, model_id, steering_correction, dropout, center_only, suffix = '', ext = 'h5'):
     model_dir = '.\\{}'.format(model_id)
     make_dir_if_not_exist(model_dir)
