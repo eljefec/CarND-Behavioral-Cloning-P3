@@ -1,9 +1,5 @@
 #**Behavioral Cloning** 
 
-##Writeup Template
-
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
 ---
 
 **Behavioral Cloning Project**
@@ -36,9 +32,13 @@ The goals / steps of this project are the following:
 
 My project includes the following files:
 * model.py containing the script to create and train the model
+* load.py for loading training data
+* pre.py for preprocessing training data
+* build.py for building a neural network
+* history.py for dumping Keras history object
 * drive.py for driving the car in autonomous mode
 * model.h5 containing a trained convolution neural network 
-* writeup_report.md or writeup_report.pdf summarizing the results
+* writeup_report.md summarizing the results
 
 ####2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
@@ -54,23 +54,31 @@ The model.py file contains the code for training and saving the convolution neur
 
 ####1. An appropriate model architecture has been employed
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24) 
+Code file: build.py
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18). 
+My model consists of a convolution neural network with 3x3 and 5x5 filter sizes and depths between 24 and 64 (build.py lines 63-67) 
+
+The model includes RELU layers to introduce nonlinearity (code lines 45, 73, 75, 77). The data is normalized in the model using a Keras lambda layer (code line 56). 
+
+The model crops out the top 50 pixels and the bottom 20 pixels to ignore the sky and car hood respectively (code line 53).
+
+The model has a Color Space Transformation layer to allow the model to learn the best color representations (code line 56).
 
 ####2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines 21). 
+To reduce overfitting, the model contains dropout layers before the final fully connected layers (build.py lines 72, 74, 76, 78). 
 
-The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to ensure that the model was not overfitting (model.py line 58). 
+
+I tested the model by running it through the simulator and ensuring that the vehicle stayed on the track.
 
 ####3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 47).
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+I used the training data provided by Udacity. It is mostly center lane driving. I included examples of turning left at the fork between pavement and dirt roads.
 
 For details about how I created the training data, see the next section. 
 
@@ -78,19 +86,36 @@ For details about how I created the training data, see the next section.
 
 ####1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to start with a simple model then improve it through architecture tweaks and training data augmentation.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+I originally started with a LeNet architecture to confirm that my training pipeline worked. The trained model performed terribly. It turns out that I was training my model with RGB images whereas the driving script was receiving BGR images from the simulator. I fixed this by using 'cv2.imread'.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+To prove that my training pipeline worked with BGR images, I started with a very simple model of mostly fully connected layers. See function 'build_model_simple' in build.py (code lines 21-29). This simple model was successful in driving basically, but it was not good enough to drive the whole track.
 
-To combat the overfitting, I modified the model so that ...
+I read some Udacity forum posts that other students had success using the Nvidia model described in 'http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf'.
 
-Then I ... 
+I started with a convolutional neural network similar to the Nvidia model and trained it on the data provided by Udacity, but only the center camera images. The model was able to drive more of the track, but it had difficulty at the fork between pavement and dirt road.
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
+I proceeded to augment the training data. 
+
+I flipped all images horizontally (and negated their corresponding steering angles) to double my training set size. This also balanced the bias in the data towards left turns such that left and right turns were equally represented.
+
+I incorporated the left and right camera images and used them as training examples by modifying the actual steering angle with an appropriate correction value (this ended up being 0.04 in my final model).
+
+To improve behavior at the pavement-dirt fork, I recorded several center-lane driving examples of turning left at the fork. When I included these examples, it was not sufficient to influence my model to prefer the pavement side of the fork. I included my fork dataset 5 times, and found that was successful at correcting my model at the fork.
+
+I now had to tune my hyperparameters: steering correction value, dropout probability, and number of epochs. I experimented with these hyperparameters by training models with varying hyperparameter values then running the models in the simulator. I tried steering correction values between 0.01 and 0.25 and dropout probabilities between 0.1 and 0.5.
+
+During this experimentation process, I modified the training pipeline to incorporate Keras callbacks EarlyStopping and ModelCheckpoint.
+
+My model was able to drive successfully around the track with these hyperparameters:
+1. Steering correction: 0.04
+2. Dropout probability: 0.2
+3: Number of epochs: 13 (with early stopping)
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+
+## TODO below
 
 ####2. Final Model Architecture
 
