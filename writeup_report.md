@@ -87,7 +87,9 @@ For details about how I created the training data, see the next section.
 
 ####1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to start with a simple model then improve it through architecture tweaks and training data augmentation.
+My overall strategy for deriving a model architecture was to start with a simple model, improve it through architecture tweaks and training data augmentation, and to test the model in the simulator.
+
+I learned many tips and pointers from [Behavioral Cloning Cheatsheet](https://carnd-forums.udacity.com/questions/26214464/behavioral-cloning-cheatsheet) by Paul Heraty.
 
 I originally started with a LeNet architecture to confirm that my training pipeline worked. The trained model performed terribly. It turns out that I was training my model with RGB images whereas the driving script was receiving BGR images from the simulator. I fixed this by using 'cv2.imread'.
 
