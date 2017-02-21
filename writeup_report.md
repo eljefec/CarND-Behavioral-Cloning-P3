@@ -1,5 +1,7 @@
 #**Behavioral Cloning** 
 
+Author: Jeffrey Liu
+
 ---
 
 **Behavioral Cloning Project**
@@ -92,9 +94,7 @@ I originally started with a LeNet architecture to confirm that my training pipel
 
 To prove that my training pipeline worked with BGR images, I started with a very simple model of mostly fully connected layers. See function 'build_model_simple' in build.py (code lines 21-29). This simple model was successful in driving basically, but it was not good enough to drive the whole track.
 
-I read some Udacity forum posts that other students had success using the Nvidia model described in 'http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf'.
-
-I started with a convolutional neural network similar to the Nvidia model and trained it on the data provided by Udacity, but only the center camera images. The model was able to drive more of the track, but it had difficulty at the fork between pavement and dirt road.
+I started with a convolutional neural network similar to the [Nvidia model](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf) and trained it on the data provided by Udacity, but only the center camera images. The model was able to drive more of the track, but it had difficulty at the fork between pavement and dirt road.
 
 I proceeded to augment the training data. 
 
@@ -115,15 +115,63 @@ My model was able to drive successfully around the track with these hyperparamet
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
-## TODO below
-
 ####2. Final Model Architecture
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to
+====================================================================================================
+cropping2d_4 (Cropping2D)        (None, 90, 320, 3)    0           cropping2d_input_1[0][0]
+____________________________________________________________________________________________________
+lambda_5 (Lambda)                (None, 90, 320, 3)    0           cropping2d_4[0][0]
+____________________________________________________________________________________________________
+convolution2d_19 (Convolution2D) (None, 90, 320, 3)    12          lambda_5[0][0]
+____________________________________________________________________________________________________
+convolution2d_20 (Convolution2D) (None, 43, 158, 24)   1824        convolution2d_19[0][0]
+____________________________________________________________________________________________________
+activation_16 (Activation)       (None, 43, 158, 24)   0           convolution2d_20[0][0]
+____________________________________________________________________________________________________
+convolution2d_21 (Convolution2D) (None, 20, 77, 36)    21636       activation_16[0][0]
+____________________________________________________________________________________________________
+activation_17 (Activation)       (None, 20, 77, 36)    0           convolution2d_21[0][0]
+____________________________________________________________________________________________________
+convolution2d_22 (Convolution2D) (None, 8, 37, 48)     43248       activation_17[0][0]
+____________________________________________________________________________________________________
+activation_18 (Activation)       (None, 8, 37, 48)     0           convolution2d_22[0][0]
+____________________________________________________________________________________________________
+convolution2d_23 (Convolution2D) (None, 3, 18, 64)     27712       activation_18[0][0]
+____________________________________________________________________________________________________
+activation_19 (Activation)       (None, 3, 18, 64)     0           convolution2d_23[0][0]
+____________________________________________________________________________________________________
+convolution2d_24 (Convolution2D) (None, 1, 8, 64)      36928       activation_19[0][0]
+____________________________________________________________________________________________________
+activation_20 (Activation)       (None, 1, 8, 64)      0           convolution2d_24[0][0]
+____________________________________________________________________________________________________
+flatten_5 (Flatten)              (None, 512)           0           activation_20[0][0]
+____________________________________________________________________________________________________
+dropout_13 (Dropout)             (None, 512)           0           flatten_5[0][0]
+____________________________________________________________________________________________________
+dense_15 (Dense)                 (None, 100)           51300       dropout_13[0][0]
+____________________________________________________________________________________________________
+dropout_14 (Dropout)             (None, 100)           0           dense_15[0][0]
+____________________________________________________________________________________________________
+dense_16 (Dense)                 (None, 50)            5050        dropout_14[0][0]
+____________________________________________________________________________________________________
+dropout_15 (Dropout)             (None, 50)            0           dense_16[0][0]
+____________________________________________________________________________________________________
+dense_17 (Dense)                 (None, 10)            510         dropout_15[0][0]
+____________________________________________________________________________________________________
+dropout_16 (Dropout)             (None, 10)            0           dense_17[0][0]
+____________________________________________________________________________________________________
+dense_18 (Dense)                 (None, 1)             11          dropout_16[0][0]
+====================================================================================================
+Total params: 188,231
+Trainable params: 188,231
+Non-trainable params: 0
+____________________________________________________________________________________________________
 
-![alt text][image1]
+## TODO below
 
 ####3. Creation of the Training Set & Training Process
 
