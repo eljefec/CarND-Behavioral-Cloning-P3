@@ -72,9 +72,10 @@ parser = argparse.ArgumentParser(description='Build Model')
 parser.add_argument('id', type=str, help='Required model identifier.')
 args = parser.parse_args()
 
+# Train a simple model with a single epoch as a smoke test.
 train_model('simple', args.id, 'e:\\capture-data-archive', 0.01, 0.8, center_only = False, nb_epoch = 1)
 
 for steering_correction in [0.04]:
-    for dropout in [0.1, 0.2, 0.3, 0.4, 0.5]:
+    for dropout in [0.2]:
         for center_only in [False]:
             train_model('nvda', args.id, 'e:\\capture-data', steering_correction, dropout, center_only, nb_epoch = 99)
