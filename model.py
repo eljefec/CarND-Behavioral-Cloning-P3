@@ -6,6 +6,19 @@ import build as bld
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
+# Train a neural network model.
+#
+# Parameters:
+#     model_name: 'simple' or 'nvda'
+#     model_id: Identifier for generated model files.
+#     capture_root: Root folder containing training examples. 
+#     steering_correction: Steering correction value for left and right images.
+#     dropout: Dropout probability.
+#     center_only: Use the center image only.
+#     nb_epoch: Number of epochs.
+#
+# Returns Keras history object.
+#
 def train_model(model_name, model_id, capture_root, steering_correction, dropout, center_only, nb_epoch):
     print()
     print('Train model. id=[{}], capture_root=[{}], steering_correction=[{}], dropout=[{}], center_only=[{}], nb_epoch=[{}].'.format(model_id, capture_root, steering_correction, dropout, center_only, nb_epoch))
@@ -35,6 +48,7 @@ def train_model(model_name, model_id, capture_root, steering_correction, dropout
 
     checkpoint_path = get_model_filename(model_name, model_id, steering_correction, dropout, center_only, suffix = 'e{epoch:02d}-vl{val_loss:.2f}')
 
+    # Set up callbacks. Stop early if the model does not improve. Save model checkpoints.
     # Source: http://stackoverflow.com/questions/37293642/how-to-tell-keras-stop-training-based-on-loss-value
     callbacks = [
         EarlyStopping(monitor='val_loss', patience=2, verbose=0),
@@ -75,6 +89,7 @@ args = parser.parse_args()
 # Train a simple model with a single epoch as a smoke test.
 train_model('simple', args.id, 'e:\\capture-data-archive', 0.01, 0.8, center_only = False, nb_epoch = 1)
 
+# Train model with final parameters.
 for steering_correction in [0.04]:
     for dropout in [0.2]:
         for center_only in [False]:
